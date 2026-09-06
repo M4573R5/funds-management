@@ -12,353 +12,342 @@
     <style>
         :root {
             --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary-dark: #1e40af;
             --bg-main: #f8fafc;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #94a3b8;
             --border: #e2e8f0;
+            --text-dark: #0f172a;
         }
 
         body {
             font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
             background: var(--bg-main);
             color: var(--text-dark);
-            margin: 0;
-            padding: 40px 20px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .workspace {
-            max-width: 900px;
-            margin: 0 auto;
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            box-sizing: border-box;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .header-section {
+        .sidebar-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 32px;
+            padding-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        .view-header {
             margin-bottom: 30px;
         }
 
-        h1 {
-            font-size: 26px;
+        .view-header h1 {
+            font-size: 24px;
             margin: 0 0 6px 0;
             color: #1e3a8a;
         }
 
-        p.subtitle {
-            color: var(--text-muted);
+        .view-header p {
             margin: 0;
             font-size: 14px;
+            color: #64748b;
         }
 
-        .ledger-container {
+        .metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
             background: white;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border);
-            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        th {
-            background: #f1f5f9;
-            padding: 14px 16px;
-            font-weight: 600;
-            color: #475569;
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            color: #334155;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: #fafafa;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 8px;
+        .stat-title {
             font-size: 11px;
-            font-weight: 700;
-            border-radius: 6px;
             text-transform: uppercase;
+            font-weight: 600;
+            color: #64748b;
             letter-spacing: 0.5px;
         }
 
-        .approved {
-            background: #dcfce7;
-            color: #15803d;
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 6px;
         }
 
-        .flagged {
-            background: #fef3c7;
-            color: #b45309;
+        .dashboard-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
         }
 
-        .rejected {
-            background: #fee2e2;
-            color: #b91c1c;
+        .chart-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            height: 340px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title {
+            margin: 0 0 15px 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1e3a8a;
+        }
+
+        .grid-layout-workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .ledger-card {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .ledger-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
         }
 
         .fab-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 56px;
-            height: 56px;
+            width: 50px;
+            height: 50px;
             background: var(--primary);
             color: white;
             border-radius: 50%;
             border: none;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -4px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: transform 0.2s, background 0.2s;
-            z-index: 10;
-        }
-
-        .fab-btn:hover {
-            background: var(--primary-hover);
-            transform: scale(1.05);
-        }
-
-        .drawer {
-            position: fixed;
-            top: 0;
-            right: -420px;
-            width: 380px;
-            height: 100%;
-            background: white;
-            box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 30px 20px;
-            box-sizing: border-box;
-            z-index: 20;
-            border-left: 1px solid var(--border);
-            overflow-y: auto;
-        }
-
-        .drawer.open {
-            right: 0;
-        }
-
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .drawer-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e3a8a;
-            margin: 0;
-        }
-
-        .close-drawer {
-            background: none;
-            border: none;
             font-size: 20px;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 12px;
-            display: block;
-            margin: 15px 0 6px 0;
-            color: #475569;
-            text-transform: uppercase;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-sizing: border-box;
-            outline: none;
-            font-family: inherit;
-            resize: none;
-        }
-
-        .upload-zone {
-            background: #f1f5f9;
-            border: 2px dashed #cbd5e1;
-            padding: 20px 10px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 13px;
-            color: #334155;
-            font-weight: 500;
-        }
-
-        .upload-zone:hover {
-            background: #e2e8f0;
-        }
-
-        .audit-trigger-btn {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            margin-top: 20px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .audit-trigger-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .audit-trigger-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        .error-banner {
-            display: none;
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            margin-bottom: 15px;
+            font-weight: bold;
+            z-index: 10;
         }
     </style>
 </head>
 
 <body>
-    <div style="display: grid; grid-template-columns: 4fr 3fr; gap: 30px; margin-top: 20px;">
-
-        <!-- LEFT SIDE: Summary cards list grid view area -->
-        <div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div
-                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
-                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Total
-                        Allocated Spent</div>
-                    <div id="statTotalSpent"
-                        style="font-size: 20px; font-weight: bold; color: #1e3a8a; margin-top: 4px;">R 0.00</div>
-                </div>
-                <div
-                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
-                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Flagged
-                        Audits</div>
-                    <div id="statFlaggedCount"
-                        style="font-size: 20px; font-weight: bold; color: #ef4444; margin-top: 4px;">0</div>
-                </div>
-                <div
-                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
-                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Total
-                        Documents Logs</div>
-                    <div id="statReceiptCount"
-                        style="font-size: 20px; font-weight: bold; color: #10b981; margin-top: 4px;">0</div>
-                </div>
-            </div>
-
-            <div class="grid-layout-workspace" id="ledgerGrid"
-                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                <!-- Audited assets cards grid layouts loop here -->
-            </div>
+    <div class="sidebar">
+        <div class="sidebar-brand">🛡️ KindnessLedger</div>
+        <div class="nav-items">
+            <button id="nav-dash" class="nav-btn active" onclick="switchActiveView('dashboard')">🏠 Command
+                Dashboard</button>
+            <button id="nav-ledger" class="nav-btn" onclick="switchActiveView('ledger')">📋 Compliance Ledger</button>
+            <button id="nav-settings" class="nav-btn" onclick="switchActiveView('settings')">⚙️ Mission
+                Settings</button>
         </div>
-
-        <!-- RIGHT SIDE: Expenditure Category Breakdown Graphical Charts View Box Container -->
-        <div
-            style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; height: 380px; position: sticky; top: 40px; display: flex; flex-direction: column;">
-            <h4
-                style="margin: 0 0 15px 0; color: #1e3a8a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
-                Expenditure Allocation Breakdown</h4>
-            <div style="flex: 1; position: relative;">
-                <canvas id="analyticsChart"></canvas>
-            </div>
-        </div>
-
+        <div style="font-size:11px; color:var(--sidebar-text); text-align:center;">v1.0.0 (SQLite Local)</div>
     </div>
 
-    <div class="workspace">
-        <div class="grid-layout-workspace" id="ledgerGrid"></div>
-        <div id="detailsModal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:30; align-items:center; justify-content:center;">
+    <div class="main-content">
+        <div id="view-dashboard" class="view-panel active">
+            <div class="view-header">
+                <h1>Command Dashboard</h1>
+                <p>Real-time expenditure summary metrics and live risk breakdown charts.</p>
+            </div>
+
+            <div class="metrics-bar">
+                <div class="stat-card">
+                    <div class="stat-title">Allocated Total Spent</div>
+                    <div class="stat-value" id="statTotalSpent" style="color:#1e3a8a;">R 0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Flagged Audit Alerts</div>
+                    <div class="stat-value" id="statFlaggedCount" style="color:#ef4444;">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Total Active Documents</div>
+                    <div class="stat-value" id="statReceiptCount" style="color:#10b981;">0</div>
+                </div>
+            </div>
+
+            <div class="dashboard-split">
+                <div class="chart-box">
+                    <div class="chart-title">Expenditure Allocation</div>
+                    <div style="flex:1; position:relative;"><canvas id="analyticsChart"></canvas></div>
+                </div>
+                <div style="background:white; padding:25px; border-radius:12px; border:1px solid var(--border);">
+                    <h4 style="margin:0 0 10px 0; color:#1e3a8a;">Quick Help Tip:</h4>
+                    <p style="font-size:13px; color:#475569; line-height:1.5; margin:0;">
+                        Use the <strong>"＋" button</strong> in the bottom right corner to upload or scan a new grocery
+                        receipt asset. The system automatically categorizes and flags compliance line items in real
+                        time.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-ledger" class="view-panel">
+            <div class="view-header">
+                <h1>Compliance Ledger History</h1>
+                <p>Comprehensive repository of all processed non-profit document transactions.</p>
+            </div>
+            <div class="grid-layout-workspace" id="ledgerGrid"></div>
+        </div>
+        <div id="view-settings" class="view-panel">
+            <div class="view-header">
+                <h1>Mission & Rules Scope</h1>
+                <p>Configure the foundational target boundaries Gemini uses to judge due-cause spending compliance.</p>
+            </div>
             <div
-                style="background:white; padding:30px; border-radius:12px; width:460px; max-width:90%; position:relative; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15);">
-                <button onclick="closeDetailPopup()"
-                    style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
-
-                <h3 id="modalVendor" style="margin:0 0 5px 0; color:#1e3a8a; font-size:20px;">Vendor Name</h3>
-                <div id="modalMetaLine"
-                    style="font-size:12px; color:#64748b; margin-top:-2px; margin-bottom:15px; font-weight:400;">
-                    Transaction Date: - &nbsp;|&nbsp; Receipt ID: -
-                </div>
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
-                    <span id="modalTotal" style="font-size:24px; font-weight:bold; color:#0f172a;">$0.00</span>
-                    <span id="modalBadge" class="badge">PENDING</span>
-                </div>
-
-                <h4
-                    style="margin:0 0 8px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
-                    Extracted Item Inventory:</h4>
-
-                <ul id="modalItemsList"
-                    style="margin:0 0 20px 0; padding-left:20px; font-size:14px; color:#334155; line-height:1.6;">
-                </ul>
-
-                <h4
-                    style="margin:0 0 6px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
-                    Auditor Compliance Remarks:</h4>
-                <p id="modalReasoning"
-                    style="margin:0; font-size:13px; color:#4b5563; background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0; line-height:1.4; font-style:italic;">
-                    Reasoning content pops here.</p>
+                style="background:white; padding:30px; border-radius:12px; border:1px solid var(--border); max-width:600px;">
+                <label
+                    style="font-weight:600; font-size:12px; display:block; margin-bottom:8px; color:#475569; text-transform:uppercase;">Active
+                    Compliance Goal Charter</label>
+                <textarea id="missionText" rows="4"
+                    style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-family:inherit; font-size:14px;">A charity operating a local community food bank and emergency kitchen supplying free hot meals to low-income families.</textarea>
+                <p style="font-size:12px; color:#64748b; margin-top:8px; line-height:1.4;">
+                    💡 Changing this text directly alters how Gemini evaluates items. If you shift your charity
+                    operations to medical aid or schooling kits, update this target charter accordingly.
+                </p>
             </div>
         </div>
 
     </div>
-
     <button class="fab-btn" onclick="toggleDrawer(true)" title="Audit New Receipt File">＋</button>
-
-    <div id="auditDrawer" class="drawer">
-        <div class="drawer-header">
-            <h3 class="drawer-title">New Receipt Audit</h3>
-            <button class="close-drawer" onclick="toggleDrawer(false)">✕</button>
+    <div id="auditDrawer" class="drawer"
+        style="position: fixed; top: 0; right: -420px; width: 380px; height: 100%; background: white; box-shadow: -10px 0 25px -5px rgba(0,0,0,0.1); transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; box-sizing: border-box; z-index: 20; border-left: 1px solid var(--border); overflow-y: auto;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <h3 style="font-size: 18px; font-weight: 600; color: #1e3a8a; margin: 0;">New Receipt Audit</h3>
+            <button style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);"
+                onclick="toggleDrawer(false)">✕</button>
         </div>
 
-        <div id="errorBox" class="error-banner"></div>
+        <div id="errorBox" class="error-banner"
+            style="display: none; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px;">
+        </div>
 
-        <label for="missionText">NGO Mission Compliance Scope</label>
-        <textarea id="missionText"
-            rows="3">A charity operating a local community food bank and emergency kitchen supplying free hot meals to low-income families.</textarea>
-
-        <label>Receipt Source Attachment</label>
-        <div class="upload-zone" onclick="triggerFilePicker()">
+        <label
+            style="font-weight: 600; font-size: 12px; display: block; margin: 15px 0 6px 0; color: #475569; text-transform: uppercase;">Receipt
+            Source Attachment</label>
+        <div class="upload-zone" onclick="triggerFilePicker()"
+            style="background: #f1f5f9; border: 2px dashed #cbd5e1; padding: 25px 10px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; color: #334155; font-weight: 500;">
             <span id="fileLabel">📁 Attach Local Document Image...</span>
         </div>
 
-        <button class="audit-trigger-btn" id="submitBtn" onclick="runAuditWorkflow()">Analyze Asset via Gemini</button>
+        <button class="audit-trigger-btn" id="submitBtn" onclick="runAuditWorkflow()"
+            style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; margin-top: 25px; cursor: pointer; font-size: 14px;">Analyze
+            Asset via Gemini</button>
+    </div>
+
+    <div id="detailsModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:30; align-items:center; justify-content:center;">
+        <div
+            style="background:white; padding:30px; border-radius:12px; width:480px; max-width:90%; position:relative; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15); max-height: 85vh; overflow-y: auto;">
+            <button onclick="closeDetailPopup()"
+                style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
+
+            <h3 id="modalVendor" style="margin:0 0 5px 0; color:#1e3a8a; font-size:22px;">Vendor Name</h3>
+
+            <div id="modalMetaLine"
+                style="font-size:12px; color:#64748b; margin-top:-2px; margin-bottom:15px; font-weight:400; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                Transaction Date: - &nbsp;|&nbsp; Receipt ID: -
+            </div>
+
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background: #f8fafc; padding: 12px; border-radius: 8px;">
+                <span id="modalTotal" style="font-size:24px; font-weight:bold; color:#0f172a;">R 0.00</span>
+                <span id="modalBadge" class="badge">PENDING</span>
+            </div>
+
+            <h4
+                style="margin:0 0 10px 0; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px; font-weight: 700;">
+                Extracted Item Inventory:</h4>
+            <ul id="modalItemsList" style="margin:0 0 25px 0; padding-left:0; list-style: none; font-size:14px;"></ul>
+
+            <h4
+                style="margin:0 0 6px 0; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px; font-weight: 700;">
+                Auditor Compliance Remarks:</h4>
+            <p id="modalReasoning"
+                style="margin:0; font-size:13px; color:#4b5563; background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0; line-height:1.4; font-style:italic;">
+                Reasoning context pops here.</p>
+        </div>
     </div>
 
 </body>

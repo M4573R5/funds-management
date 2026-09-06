@@ -1,1 +1,485 @@
-Hello world
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management System</title>
+    <script src="assets/tailwind.js"></script>
+    <script src="assets/script.js" defer></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-main: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .workspace {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 0 0 6px 0;
+            color: #1e3a8a;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .ledger-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: #334155;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .approved {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .flagged {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .fab-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3), 0 4px 6px -4px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 10;
+        }
+
+        .fab-btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 380px;
+            height: 100%;
+            background: white;
+            box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            z-index: 20;
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .close-drawer {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 12px;
+            display: block;
+            margin: 15px 0 6px 0;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            font-family: inherit;
+            resize: none;
+        }
+
+        .upload-zone {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            padding: 20px 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .upload-zone:hover {
+            background: #e2e8f0;
+        }
+
+        .audit-trigger-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .audit-trigger-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .audit-trigger-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .error-banner {
+            display: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="workspace">
+        <div class="grid-layout-workspace" id="ledgerGrid"></div>
+        <div id="detailsModal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:30; align-items:center; justify-content:center;">
+            <div
+                style="background:white; padding:30px; border-radius:12px; width:460px; max-width:90%; position:relative; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15);">
+                <button onclick="closeDetailPopup()"
+                    style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
+
+                <h3 id="modalVendor" style="margin:0 0 5px 0; color:#1e3a8a; font-size:20px;">Vendor Name</h3>
+                <div id="modalMetaLine" style="font-size:12px; color:#64748b; margin-top:-2px; margin-bottom:15px; font-weight:400;">
+                    Transaction Date: - &nbsp;|&nbsp; Receipt ID: -
+                </div>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                    <span id="modalTotal" style="font-size:24px; font-weight:bold; color:#0f172a;">$0.00</span>
+                    <span id="modalBadge" class="badge">PENDING</span>
+                </div>
+
+                <h4
+                    style="margin:0 0 8px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
+                    Extracted Item Inventory:</h4>
+
+                <ul id="modalItemsList" style="margin:0 0 20px 0; padding-left:20px; font-size:14px; color:#334155; line-height:1.6;">
+                </ul>
+
+                <h4 style="margin:0 0 6px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
+                    Auditor Compliance Remarks:</h4>
+                <p id="modalReasoning"
+                    style="margin:0; font-size:13px; color:#4b5563; background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0; line-height:1.4; font-style:italic;">
+                    Reasoning content pops here.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="fab-btn" onclick="toggleDrawer(true)" title="Audit New Receipt File">＋</button>
+
+    <div id="auditDrawer" class="drawer">
+        <div class="drawer-header">
+            <h3 class="drawer-title">New Receipt Audit</h3>
+            <button class="close-drawer" onclick="toggleDrawer(false)">✕</button>
+        </div>
+
+        <div id="errorBox" class="error-banner"></div>
+
+        <label for="missionText">NGO Mission Compliance Scope</label>
+        <textarea id="missionText"
+            rows="3">A charity operating a local community food bank and emergency kitchen supplying free hot meals to low-income families.</textarea>
+
+        <label>Receipt Source Attachment</label>
+        <div class="upload-zone" onclick="triggerFilePicker()">
+            <span id="fileLabel">📁 Attach Local Document Image...</span>
+        </div>
+
+        <button class="audit-trigger-btn" id="submitBtn" onclick="runAuditWorkflow()">Analyze Asset via Gemini</button>
+    </div>
+    <script>
+        let selectedPathString = '';
+        let auditedRecordsCache = [];
+        
+        function toggleDrawer(openState) {
+            const drawer = document.getElementById('auditDrawer');
+            if (openState) {
+                drawer.classList.add('open');
+            } else {
+                drawer.classList.remove('open');
+            }
+        }
+
+        function triggerFilePicker() {
+            document.getElementById('errorBox').style.display = 'none';
+
+            pywebview.api.select_local_file().then(function (filePath) {
+                if (filePath && typeof filePath === 'string' && filePath.trim() !== "") {
+                    selectedPathString = filePath;
+
+                    let displayLabel = filePath.split(/[\\/]/).pop();
+                    document.getElementById('fileLabel').innerText = "✓ Ready: " + displayLabel;
+                    console.log("Secure file string mapped safely in state:", selectedPathString);
+                } else {
+                    console.log("User cancelled file selection or empty path string captured.");
+                }
+            }).catch(function (err) {
+                showInlineError("File window dialog interface issue: " + err);
+            });
+        }
+
+        function runAuditWorkflow() {
+            const mission = document.getElementById('missionText').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const errorBox = document.getElementById('errorBox');
+
+            if (!selectedPathString) {
+                showInlineError("Validation Error: Please attach a local document receipt image first.");
+                return;
+            }
+
+            errorBox.style.display = 'none';
+            submitBtn.innerText = "🔄 Reading Image Matrix...";
+            submitBtn.disabled = true;
+
+            pywebview.api.audit_receipt_router('file', selectedPathString, '', mission)
+                .then(function (res) {
+                    submitBtn.innerText = "Analyze Asset via Gemini";
+                    submitBtn.disabled = false;
+
+                    if (res.error) {
+                        showInlineError(res.error);
+                    } else {
+                        const receiptNum = res.receipt_number || "Unknown";
+
+                        if (receiptNum !== "Unknown") {
+                            const isDuplicate = auditedRecordsCache.some(item => item.receiptNumber === receiptNum);
+                            if (isDuplicate) {
+                                showInlineError(`❌ Duplicate Blocked: Receipt number [${receiptNum}] has already been captured in this ledger instance!`);
+                                toggleDrawer(false);
+                                resetFormFields();
+                                return;
+                            }
+                        }
+
+                        const recordId = "rec_" + Date.now();
+                        const recordObject = {
+                            id: recordId,
+                            vendor: res.vendor || "Unknown Vendor",
+                            total: res.total_amount || "$0.00",
+                            date: res.date || "Unknown",
+                            receiptNumber: receiptNum,
+                            items: res.items_extracted || [],
+                            rating: res.due_cause_rating || "FLAGGED",
+                            reasoning: res.compliance_reasoning || "No reasoning attached."
+                        };
+
+                        auditedRecordsCache.unshift(recordObject);
+
+                        renderNewLedgerCard(recordObject);
+                        toggleDrawer(false);
+                        resetFormFields();
+                    }
+                })
+                .catch(function (err) {
+                    submitBtn.innerText = "Analyze Asset via Gemini";
+                    submitBtn.disabled = false;
+                    showInlineError("Pipeline communication crash: " + err);
+                });
+        }
+
+        function renderNewLedgerCard(record) {
+            const gridContainer = document.getElementById('ledgerGrid');
+            const card = document.createElement('div');
+            card.className = 'ledger-card';
+            card.setAttribute('data-id', record.id);
+
+            card.onclick = function () {
+                openDetailPopup(record.id);
+            };
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="card-vendor">${record.vendor}</span>
+                    <span class="badge ${record.rating.toLowerCase()}">${record.rating}</span>
+                </div>
+                <div class="card-total">${record.total}</div>
+                <div style="font-size:11px; color:#64748b; margin-top:5px; line-height: 1.4;">
+                    📅 Date: ${record.date}<br>
+                    🆔 Doc #: ${record.receiptNumber}
+                </div>
+                <div class="card-footer-tip" style="margin-top:10px;">Click card to verify items ➔</div>
+            `;
+
+            gridContainer.insertBefore(card, gridContainer.firstChild);
+        }
+
+        function openDetailPopup(id) {
+            const record = auditedRecordsCache.find(item => item.id === id);
+            if (!record) return;
+
+            document.getElementById('modalVendor').innerText = record.vendor;
+            document.getElementById('modalTotal').innerText = record.total;
+
+            document.getElementById('modalMetaLine').innerHTML = `
+                Transaction Date: <strong>${record.date}</strong> &nbsp;|&nbsp; Receipt ID: <strong>${record.receiptNumber}</strong>
+            `;
+
+            const badge = document.getElementById('resBadge') || document.getElementById('modalBadge');
+            if (badge) {
+                badge.innerText = record.rating;
+                badge.className = "badge " + record.rating.toLowerCase();
+            }
+
+            const itemsListContainer = document.getElementById('modalItemsList');
+            itemsListContainer.innerHTML = "";
+
+            if (!record.items || record.items.length === 0) {
+                itemsListContainer.innerHTML = "<li>No items found</li>";
+            } else {
+                record.items.forEach(function (item) {
+                    const li = document.createElement('li');
+                    li.style.display = "flex";
+                    li.style.justifyContent = "space-between";
+                    li.style.marginBottom = "4px";
+                    li.innerHTML = `<span>${item.name}</span><span style="font-weight:600; font-family:monospace;">${item.price}</span>`;
+                    itemsListContainer.appendChild(li);
+                });
+            }
+
+            document.getElementById('modalReasoning').innerText = record.reasoning;
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        function closeDetailPopup() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        function showInlineError(msg) {
+            const box = document.getElementById('errorBox');
+            box.innerText = msg;
+            box.style.display = 'block';
+        }
+
+        function resetFormFields() {
+            selectedPathString = '';
+            document.getElementById('fileLabel').innerText = "📁 Attach Local Document Image...";
+        }
+
+    </script>
+</body>
+
+</html>

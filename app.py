@@ -94,7 +94,7 @@ class API:
                 "date": "Transaction date (e.g. '2026-09-06')",
                 "receipt_number": "Invoice ID number or document serial string",
                 "items_extracted": [
-                    {{"name": "Item name string", "price": "Item cost price string"}}
+                    {{"name": "Item name string", "price": "Item cost price string","flagged": "True or False, True if its a flagged item otherwise False"}}
                 ],
                 "category_breakdown": {{
                     "Food & Meals": 450.00,
@@ -157,6 +157,9 @@ class API:
                     "rating": row[7],
                     "reasoning": row[8]
                 })
+
+            from pprint import pprint
+            pprint(records)
             return records
         except Exception as e:
             return {"error": f"Failed to pull historical archive: {str(e)}"}

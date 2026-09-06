@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management System</title>
     <script src="assets/tailwind.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/script.js" defer></script>
 
     <style>
@@ -252,6 +253,52 @@
 </head>
 
 <body>
+    <div style="display: grid; grid-template-columns: 4fr 3fr; gap: 30px; margin-top: 20px;">
+
+        <!-- LEFT SIDE: Summary cards list grid view area -->
+        <div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div
+                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Total
+                        Allocated Spent</div>
+                    <div id="statTotalSpent"
+                        style="font-size: 20px; font-weight: bold; color: #1e3a8a; margin-top: 4px;">R 0.00</div>
+                </div>
+                <div
+                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Flagged
+                        Audits</div>
+                    <div id="statFlaggedCount"
+                        style="font-size: 20px; font-weight: bold; color: #ef4444; margin-top: 4px;">0</div>
+                </div>
+                <div
+                    style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600;">Total
+                        Documents Logs</div>
+                    <div id="statReceiptCount"
+                        style="font-size: 20px; font-weight: bold; color: #10b981; margin-top: 4px;">0</div>
+                </div>
+            </div>
+
+            <div class="grid-layout-workspace" id="ledgerGrid"
+                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <!-- Audited assets cards grid layouts loop here -->
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: Expenditure Category Breakdown Graphical Charts View Box Container -->
+        <div
+            style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; height: 380px; position: sticky; top: 40px; display: flex; flex-direction: column;">
+            <h4
+                style="margin: 0 0 15px 0; color: #1e3a8a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+                Expenditure Allocation Breakdown</h4>
+            <div style="flex: 1; position: relative;">
+                <canvas id="analyticsChart"></canvas>
+            </div>
+        </div>
+
+    </div>
 
     <div class="workspace">
         <div class="grid-layout-workspace" id="ledgerGrid"></div>
@@ -263,7 +310,8 @@
                     style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
 
                 <h3 id="modalVendor" style="margin:0 0 5px 0; color:#1e3a8a; font-size:20px;">Vendor Name</h3>
-                <div id="modalMetaLine" style="font-size:12px; color:#64748b; margin-top:-2px; margin-bottom:15px; font-weight:400;">
+                <div id="modalMetaLine"
+                    style="font-size:12px; color:#64748b; margin-top:-2px; margin-bottom:15px; font-weight:400;">
                     Transaction Date: - &nbsp;|&nbsp; Receipt ID: -
                 </div>
                 <div
@@ -276,10 +324,12 @@
                     style="margin:0 0 8px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
                     Extracted Item Inventory:</h4>
 
-                <ul id="modalItemsList" style="margin:0 0 20px 0; padding-left:20px; font-size:14px; color:#334155; line-height:1.6;">
+                <ul id="modalItemsList"
+                    style="margin:0 0 20px 0; padding-left:20px; font-size:14px; color:#334155; line-height:1.6;">
                 </ul>
 
-                <h4 style="margin:0 0 6px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
+                <h4
+                    style="margin:0 0 6px 0; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">
                     Auditor Compliance Remarks:</h4>
                 <p id="modalReasoning"
                     style="margin:0; font-size:13px; color:#4b5563; background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0; line-height:1.4; font-style:italic;">
@@ -310,176 +360,7 @@
 
         <button class="audit-trigger-btn" id="submitBtn" onclick="runAuditWorkflow()">Analyze Asset via Gemini</button>
     </div>
-    <script>
-        let selectedPathString = '';
-        let auditedRecordsCache = [];
-        
-        function toggleDrawer(openState) {
-            const drawer = document.getElementById('auditDrawer');
-            if (openState) {
-                drawer.classList.add('open');
-            } else {
-                drawer.classList.remove('open');
-            }
-        }
 
-        function triggerFilePicker() {
-            document.getElementById('errorBox').style.display = 'none';
-
-            pywebview.api.select_local_file().then(function (filePath) {
-                if (filePath && typeof filePath === 'string' && filePath.trim() !== "") {
-                    selectedPathString = filePath;
-
-                    let displayLabel = filePath.split(/[\\/]/).pop();
-                    document.getElementById('fileLabel').innerText = "✓ Ready: " + displayLabel;
-                    console.log("Secure file string mapped safely in state:", selectedPathString);
-                } else {
-                    console.log("User cancelled file selection or empty path string captured.");
-                }
-            }).catch(function (err) {
-                showInlineError("File window dialog interface issue: " + err);
-            });
-        }
-
-        function runAuditWorkflow() {
-            const mission = document.getElementById('missionText').value;
-            const submitBtn = document.getElementById('submitBtn');
-            const errorBox = document.getElementById('errorBox');
-
-            if (!selectedPathString) {
-                showInlineError("Validation Error: Please attach a local document receipt image first.");
-                return;
-            }
-
-            errorBox.style.display = 'none';
-            submitBtn.innerText = "🔄 Reading Image Matrix...";
-            submitBtn.disabled = true;
-
-            pywebview.api.audit_receipt_router('file', selectedPathString, '', mission)
-                .then(function (res) {
-                    submitBtn.innerText = "Analyze Asset via Gemini";
-                    submitBtn.disabled = false;
-
-                    if (res.error) {
-                        showInlineError(res.error);
-                    } else {
-                        const receiptNum = res.receipt_number || "Unknown";
-
-                        if (receiptNum !== "Unknown") {
-                            const isDuplicate = auditedRecordsCache.some(item => item.receiptNumber === receiptNum);
-                            if (isDuplicate) {
-                                showInlineError(`❌ Duplicate Blocked: Receipt number [${receiptNum}] has already been captured in this ledger instance!`);
-                                toggleDrawer(false);
-                                resetFormFields();
-                                return;
-                            }
-                        }
-
-                        const recordId = "rec_" + Date.now();
-                        const recordObject = {
-                            id: recordId,
-                            vendor: res.vendor || "Unknown Vendor",
-                            total: res.total_amount || "$0.00",
-                            date: res.date || "Unknown",
-                            receiptNumber: receiptNum,
-                            items: res.items_extracted || [],
-                            rating: res.due_cause_rating || "FLAGGED",
-                            reasoning: res.compliance_reasoning || "No reasoning attached."
-                        };
-
-                        auditedRecordsCache.unshift(recordObject);
-
-                        renderNewLedgerCard(recordObject);
-                        toggleDrawer(false);
-                        resetFormFields();
-                    }
-                })
-                .catch(function (err) {
-                    submitBtn.innerText = "Analyze Asset via Gemini";
-                    submitBtn.disabled = false;
-                    showInlineError("Pipeline communication crash: " + err);
-                });
-        }
-
-        function renderNewLedgerCard(record) {
-            const gridContainer = document.getElementById('ledgerGrid');
-            const card = document.createElement('div');
-            card.className = 'ledger-card';
-            card.setAttribute('data-id', record.id);
-
-            card.onclick = function () {
-                openDetailPopup(record.id);
-            };
-
-            card.innerHTML = `
-                <div class="card-header">
-                    <span class="card-vendor">${record.vendor}</span>
-                    <span class="badge ${record.rating.toLowerCase()}">${record.rating}</span>
-                </div>
-                <div class="card-total">${record.total}</div>
-                <div style="font-size:11px; color:#64748b; margin-top:5px; line-height: 1.4;">
-                    📅 Date: ${record.date}<br>
-                    🆔 Doc #: ${record.receiptNumber}
-                </div>
-                <div class="card-footer-tip" style="margin-top:10px;">Click card to verify items ➔</div>
-            `;
-
-            gridContainer.insertBefore(card, gridContainer.firstChild);
-        }
-
-        function openDetailPopup(id) {
-            const record = auditedRecordsCache.find(item => item.id === id);
-            if (!record) return;
-
-            document.getElementById('modalVendor').innerText = record.vendor;
-            document.getElementById('modalTotal').innerText = record.total;
-
-            document.getElementById('modalMetaLine').innerHTML = `
-                Transaction Date: <strong>${record.date}</strong> &nbsp;|&nbsp; Receipt ID: <strong>${record.receiptNumber}</strong>
-            `;
-
-            const badge = document.getElementById('resBadge') || document.getElementById('modalBadge');
-            if (badge) {
-                badge.innerText = record.rating;
-                badge.className = "badge " + record.rating.toLowerCase();
-            }
-
-            const itemsListContainer = document.getElementById('modalItemsList');
-            itemsListContainer.innerHTML = "";
-
-            if (!record.items || record.items.length === 0) {
-                itemsListContainer.innerHTML = "<li>No items found</li>";
-            } else {
-                record.items.forEach(function (item) {
-                    const li = document.createElement('li');
-                    li.style.display = "flex";
-                    li.style.justifyContent = "space-between";
-                    li.style.marginBottom = "4px";
-                    li.innerHTML = `<span>${item.name}</span><span style="font-weight:600; font-family:monospace;">${item.price}</span>`;
-                    itemsListContainer.appendChild(li);
-                });
-            }
-
-            document.getElementById('modalReasoning').innerText = record.reasoning;
-            document.getElementById('detailsModal').style.display = 'flex';
-        }
-
-        function closeDetailPopup() {
-            document.getElementById('detailsModal').style.display = 'none';
-        }
-
-        function showInlineError(msg) {
-            const box = document.getElementById('errorBox');
-            box.innerText = msg;
-            box.style.display = 'block';
-        }
-
-        function resetFormFields() {
-            selectedPathString = '';
-            document.getElementById('fileLabel').innerText = "📁 Attach Local Document Image...";
-        }
-
-    </script>
 </body>
 
 </html>

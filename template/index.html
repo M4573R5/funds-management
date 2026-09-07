@@ -246,40 +246,179 @@
 
     <div class="main-content">
         <div id="view-dashboard" class="view-panel active">
-            <div class="view-header">
-                <h1>Command Dashboard</h1>
-                <p>Real-time expenditure summary metrics and live risk breakdown charts.</p>
+            <main class="flex-1 flex flex-col min-w-0">
+
+        <!-- Top Fixed Sticky Navbar -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+            <div>
+                <h2 class="text-lg font-bold text-slate-900">Funder Compliance Workspace</h2>
+                <p class="text-xs text-slate-500">Track incoming grant allocations, original procurement quotes, and
+                    audit flags.</p>
+            </div>
+            <!-- Global Flagged Alerts Indicators Box Component -->
+            <div
+                class="bg-rose-50 text-rose-700 px-3 py-1 rounded-md text-xs font-bold flex items-center gap-2 border border-rose-100">
+                <i class="fas fa-triangle-exclamation"></i> 3 Flagged
+            </div>
+        </header>
+
+        <!-- Content Workspace Scroll Container -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-6">
+
+            <!-- SECTION 1: Strategic KPI Metric Total Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Metric Box 1 -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Allocated
+                        Pool</span>
+                    <span class="text-2xl font-black text-slate-900 mt-1 block">R 570,000.00</span>
+                    <div class="absolute right-4 bottom-4 text-slate-100"><i class="fas fa-vault text-4xl"></i></div>
+                </div>
+
+                <!-- Metric Box 2 -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Active Monitored
+                        Accounts</span>
+                    <span class="text-2xl font-black text-slate-900 mt-1 block">4 Organizations</span>
+                    <div class="absolute right-4 bottom-4 text-slate-100"><i class="fas fa-building text-4xl"></i></div>
+                </div>
+
+                <!-- Metric Box 3: Triggered Alert Warnings Highlighted -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-rose-100 bg-rose-50/10 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold text-rose-600 uppercase tracking-wider block">Procurement
+                        Variances</span>
+                    <span class="text-2xl font-black text-rose-700 mt-1 block">3 Receipts Blocked</span>
+                    <div class="absolute right-4 bottom-4 text-rose-100/50"><i
+                            class="fas fa-circle-exclamation text-4xl"></i></div>
+                </div>
+
             </div>
 
-            <div class="metrics-bar">
-                <div class="stat-card">
-                    <div class="stat-title">Allocated Total Spent</div>
-                    <div class="stat-value" id="statTotalSpent" style="color:#1e3a8a;">R 0.00</div>
+            <!-- SECTION 2: Dynamic Visual Analytics Layout Canvas Split -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Graphic Container A: Expenditure Allocation Donut Breakdowns -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-96">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Expenditure Allocation</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Summary of settled line-item classifications across all
+                            portfolios.</p>
+                    </div>
+
+                    <!-- Mock Chart Visualization Node Component Canvas -->
+                    <div class="flex items-center justify-center py-4">
+                        <div
+                            class="relative w-44 h-44 rounded-full border-[18px] border-slate-100 flex items-center justify-center before:absolute before:inset-[-18px] before:rounded-full before:border-[18px] before:border-transparent before:border-t-blue-600 before:border-r-amber-500 before:rotate-45">
+                            <div class="text-center">
+                                <span class="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Total
+                                    Spent</span>
+                                <span class="text-base font-black text-slate-900">R 9,420.10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Legend Keys -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs pt-4 border-t border-slate-100">
+                        <div>
+                            <span class="inline-block w-2 h-2 rounded-full bg-blue-600 mr-1.5"></span>
+                            <span class="text-slate-500 font-medium">Nutrition Supplies</span>
+                        </div>
+                        <div>
+                            <span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>
+                            <span class="text-slate-500 font-medium">Logistics & Fleet</span>
+                        </div>
+                        <div>
+                            <span class="inline-block w-2 h-2 rounded-full bg-slate-200 mr-1.5"></span>
+                            <span class="text-slate-500 font-medium">Other Ops</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-title">Flagged Audit Alerts</div>
-                    <div class="stat-value" id="statFlaggedCount" style="color:#ef4444;">0</div>
+
+                <!-- Graphic Container B: UPGRADED Funder Compliance & Capacity Tracker -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-96">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Funders Compliance & Capacity</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Real-time status overview of funding capacity matched
+                            with audit profiles.</p>
+                    </div>
+
+                    <!-- Stacked Capacity Matrix Layout Blocks with Ledger Status Highlights -->
+                    <div class="space-y-4 py-2">
+
+                        <!-- Item Row 1: The Ubuntu Foundation -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-slate-800">The Ubuntu Foundation</span>
+                                    <!-- Matches your exact image status style -->
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">Grant
+                                        Active</span>
+                                </div>
+                                <span class="text-slate-500 font-semibold">R84,320 Left <span
+                                        class="text-[11px] text-slate-400 font-normal">/ R150k</span></span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
+                                <div class="bg-blue-600 h-full w-[56%]" title="56% Pool Capacity remaining"></div>
+                            </div>
+                        </div>
+
+                        <!-- Item Row 2: Green Energy Corp -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-slate-800">Green Energy Corp</span>
+                                    <!-- Fully Compliant highlight -->
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Fully
+                                        Compliant</span>
+                                </div>
+                                <span class="text-slate-500 font-semibold">R340,000 Left <span
+                                        class="text-[11px] text-slate-400 font-normal">/ R420k</span></span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
+                                <div class="bg-blue-600 h-full w-[80%]" title="80% Pool Capacity remaining"></div>
+                            </div>
+                        </div>
+
+                        <!-- Item Row 3: Global Health Initiative -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-slate-800">Global Health Initiative</span>
+                                    <!-- Review Required alert highlight -->
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">Review
+                                        Required</span>
+                                </div>
+                                <span class="text-rose-600 font-bold">R12,400 Left <span
+                                        class="text-[11px] text-slate-400 font-normal">/ R85k</span></span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
+                                <div class="bg-rose-500 h-full w-[14%]" title="Critically Low Balance warning flag">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 text-center">
+                        <span
+                            class="text-[11px] font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-100 transition">
+                            <i class="fas fa-layer-group mr-1.5"></i> Manage Portfolios Lifecycle
+                        </span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-title">Total Active Documents</div>
-                    <div class="stat-value" id="statReceiptCount" style="color:#10b981;">0</div>
-                </div>
+
             </div>
 
-            <div class="dashboard-split">
-                <div class="chart-box">
-                    <div class="chart-title">Expenditure Allocation</div>
-                    <div style="flex:1; position:relative;"><canvas id="analyticsChart"></canvas></div>
-                </div>
-                <div style="background:white; padding:25px; border-radius:12px; border:1px solid var(--border);">
-                    <h4 style="margin:0 0 10px 0; color:#1e3a8a;">Quick Help Tip:</h4>
-                    <p style="font-size:13px; color:#475569; line-height:1.5; margin:0;">
-                        Use the <strong>"＋" button</strong> in the bottom right corner to upload or scan a new grocery
-                        receipt asset. The system automatically categorizes and flags compliance line items in real
-                        time.
-                    </p>
-                </div>
-            </div>
+
+        </div>
+    </main>
         </div>
 
         <div id="view-ledger" class="view-panel">

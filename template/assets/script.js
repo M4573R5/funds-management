@@ -38,7 +38,7 @@ function loadHistoricalDatabaseLedger() {
                     renderNewLedgerCard(auditedRecordsCache[i]);
                 }
             }
-            calculateAndRenderChartMetrics();
+            // calculateAndRenderChartMetrics();
         }
     });
 }

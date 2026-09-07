@@ -15,16 +15,20 @@ function switchActiveView(targetViewName) {
     } else if (targetViewName === 'settings') {
         document.getElementById('nav-settings').classList.add('active');
         document.getElementById('view-settings').classList.add('active');
+    } else if (targetViewName === 'funding') {
+        document.getElementById('nav-funding').classList.add('active');
+        document.getElementById('view-funding').classList.add('active');
     }
+
+    
 }
 
 window.addEventListener('pywebviewready', function () {
-    console.log("Database command dashboard pipeline linked securely.");
     loadHistoricalDatabaseLedger();
 });
 
 function loadHistoricalDatabaseLedger() {
-    pywebview.api.load_historical_ledger().then(function (records) {
+    pywebview.api.load_receipts().then(function (records) {
         if (records && !records.error) {
             auditedRecordsCache = records;
             document.getElementById('ledgerGrid').innerHTML = "";
@@ -201,9 +205,14 @@ function openDetailPopup(id) {
     itemsListContainer.innerHTML = "";
 
     record.items.forEach(function (item) {
+        let bg = "transparent";
+        if(item.flagged == 'True'){
+            bg = "red"
+        }
         const li = document.createElement('li');
         li.style.display = "flex"; li.style.justifyContent = "space-between"; li.style.marginBottom = "6px";
         li.style.borderBottom = "1px solid #f1f5f9"; li.style.paddingBottom = "4px";
+        li.style.backgroundColor = `${bg}`;
         li.innerHTML = `<span>${item.name}</span><span style="font-weight:600; font-family:monospace;">${item.price}</span>`;
         itemsListContainer.appendChild(li);
     });

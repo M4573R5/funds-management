@@ -6,8 +6,8 @@ import sqlite3
 import time
 from google import genai
 from dotenv import load_dotenv
-
 load_dotenv()
+
 class API:
     DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kindness_ledger.db")
     def __init__(self):
@@ -34,6 +34,21 @@ class API:
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        # cursor.execute('''
+        #     CREATE TABLE IF NOT EXISTS receipts (
+        #         id TEXT PRIMARY KEY,
+        #         vendor TEXT,
+        #         total_amount TEXT,
+        #         transaction_date TEXT,
+        #         receipt_number TEXT,
+        #         items_json TEXT,
+        #         category_breakdown_json TEXT,
+        #         due_cause_rating TEXT,
+        #         compliance_reasoning TEXT,
+        #         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        #     )
+        # ''')
         conn.commit()
         conn.close()
         print(f"📁 Local SQLite Database active and synchronized at: {self.DB_PATH}")
@@ -123,6 +138,65 @@ class API:
         except Exception as e:
             return {"error": f"Audit execution failed: {str(e)}"}
 
+    def audit_agreement(self, mode, file_path, direct_base64_data):
+        if not self.api_key:
+            return {"error": "API Key Missing! Set your GEMINI_API_KEY environment variable."}
+            
+        try:
+            if mode == 'file':
+                if not os.path.exists(file_path):
+                    return {"error": f"Selected file path does not exist: {file_path}"}
+                with open(file_path, "rb") as image_file:
+                    image_payload = base64.b64encode(image_file.read()).decode("utf-8")
+            else:
+                if "," in direct_base64_data:
+                    image_payload = direct_base64_data.split(",", 1)[1]
+                else:
+                    image_payload = direct_base64_data
+
+            client = genai.Client(api_key=self.api_key)
+
+            prompt = f"""
+            You are a protective internal financial compliance auditor for a non-profit charity.
+            Analyze this receipt image and judge if the purchase fits this mission: "{mission_statement}"
+
+            Return an object with these EXACT keys (no markdown markdown wrapper code strings):
+            {{
+                "total_amount": "Total amount (e.g. 'R1016.74')",
+                "vendor": "Store name",
+                "date": "Transaction date (e.g. '2026-09-06')",
+                "receipt_number": "Invoice ID number or document serial string",
+                "items_extracted": [
+                    {{"name": "Item name string", "price": "Item cost price string","flagged": "True or False, True if its a flagged item otherwise False"}}
+                ],
+                "category_breakdown": {{
+                    "Food & Meals": 450.00,
+                    "Logistics & Transport": 0.00,
+                    "Operational Overhead": 120.00,
+                    "Unapproved / Disallowed": 446.74
+                }},
+                "due_cause_rating": "APPROVED, FLAGGED, or REJECTED",
+                "compliance_reasoning": "A concise sentence explaining the rating."
+            }}
+            
+            Note: Sum the absolute values inside 'category_breakdown' so that their totals match the receipt amount perfectly. Use numbers only for values inside the breakdown dictionary tracker mapping fields.
+            """
+            response = client.models.generate_content(
+                model='gemini-3.6-flash',
+                contents=[
+                    {"inline_data": {"mime_type": "image/jpeg", "data": image_payload}},
+                    prompt
+                ]
+            )
+            clean_text = response.text.strip().replace("```json", "").replace("```", "")
+            parsed_json = json.loads(clean_text)
+            parsed_json["id"] = self.save_to_db(parsed_json)
+            return parsed_json
+
+        except Exception as e:
+            return {"error": f"Audit execution failed: {str(e)}"}
+
+
     def select_local_file(self):
         file_types = ('Image Files (*.jpg;*.jpeg;*.png)', 'All files (*.*)')
         result = self.window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False, file_types=file_types)
@@ -158,8 +232,8 @@ class API:
                     "reasoning": row[8]
                 })
 
-            from pprint import pprint
-            pprint(records)
+            # from pprint import pprint
+            # pprint(records)
             return records
         except Exception as e:
             return {"error": f"Failed to pull historical archive: {str(e)}"}

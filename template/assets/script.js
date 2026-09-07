@@ -170,21 +170,26 @@ function renderNewLedgerCard(record) {
     const gridContainer = document.getElementById('ledgerGrid');
     if (!gridContainer) return;
     const card = document.createElement('div');
-    card.className = 'ledger-card';
+    card.className = 'p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 cursor-pointer transition shadow-sm block';
     card.setAttribute('data-id', record.id);
-    card.onclick = function () { openDetailPopup(record.id); };
+    card.onclick = function () { openDetailPopup(record.id); /*openMobileDetails();*/ };
 
     card.innerHTML = `
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span class="card-vendor" style="font-weight:700; color:#1e3a8a;">${record.vendor}</span>
-            <span class="badge ${record.rating.toLowerCase()}">${record.rating}</span>
+        <div class="flex items-start justify-between">
+            <span
+                class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100 px-2 py-0.5 rounded">${record.rating}</span>
+            <i class="fas fa-chevron-right text-blue-500 text-xs"></i>
         </div>
-        <div class="card-total" style="font-size:20px; font-weight:bold; margin-bottom:8px;">${record.total}</div>
-        <div style="font-size:11px; color:#64748b; line-height:1.4;">
-            📅 Date: ${record.date}<br>
-            🆔 Doc #: ${record.receiptNumber}
+        <h3 class="font-bold text-slate-900 mt-2 text-sm">${record.vendor}</h3>
+        <p class="text-xs text-slate-500 mt-1"><i class="fa fa-calendar"></i> <strong>${record.date}</p>
+        <div
+            class="mt-3 flex items-center justify-between text-xs border-t border-slate-100 pt-2">
+            <span class="text-slate-600 font-medium">Total: <strong>${record.total}</strong></span>
+            <span class="text-rose-600 font-semibold"><i
+                    class="fas fa-circle-exclamation mr-1"></i>2 Flags</span>
         </div>
-        <div style="font-size:11px; color:var(--primary); font-weight:600; margin-top:12px; border-top:1px dashed #e2e8f0; padding-top:8px;">Click card to verify items ➔</div>
+
+        
     `;
     gridContainer.insertBefore(card, gridContainer.firstChild);
 }
@@ -193,32 +198,50 @@ function openDetailPopup(id) {
     const record = auditedRecordsCache.find(item => item.id === id);
     if (!record) return;
 
-    document.getElementById('modalVendor').innerText = record.vendor;
-    document.getElementById('modalTotal').innerText = record.total;
-    document.getElementById('modalMetaLine').innerHTML = `Date: <strong>${record.date}</strong> &nbsp;|&nbsp; ID: <strong>${record.receiptNumber}</strong>`;
+    // document.getElementById('modalVendor').innerText = record.vendor;
+    // document.getElementById('modalTotal').innerText = record.total;
+    // document.getElementById('modalMetaLine').innerHTML = `Date: <strong>${record.date}</strong> &nbsp;|&nbsp; ID: <strong>${record.receiptNumber}</strong>`;
 
-    const badge = document.getElementById('modalBadge');
-    badge.innerText = record.rating;
-    badge.className = "badge " + record.rating.toLowerCase();
+    // const badge = document.getElementById('modalBadge');
+    // badge.innerText = record.rating;
+    // badge.className = "badge " + record.rating.toLowerCase();
 
-    const itemsListContainer = document.getElementById('modalItemsList');
+    const itemsListContainer = document.getElementById('ledgerItems');
     itemsListContainer.innerHTML = "";
 
     record.items.forEach(function (item) {
-        let bg = "transparent";
+        let bg = "emerald";
+        let icon = "fa-circle-check";
+        let compliantState = "Compliant";
         if(item.flagged == 'True'){
-            bg = "red"
+            bg = "rose";
+            icon = "fa-circle-exclamation";
+            compliantState = "Non Compliant";
         }
-        const li = document.createElement('li');
-        li.style.display = "flex"; li.style.justifyContent = "space-between"; li.style.marginBottom = "6px";
-        li.style.borderBottom = "1px solid #f1f5f9"; li.style.paddingBottom = "4px";
-        li.style.backgroundColor = `${bg}`;
-        li.innerHTML = `<span>${item.name}</span><span style="font-weight:600; font-family:monospace;">${item.price}</span>`;
-        itemsListContainer.appendChild(li);
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/80 transition"
+        tr.innerHTML = `
+        <td class="py-4 px-5">
+            <div class="font-bold text-slate-900">${item.name}</div>
+        </td>
+        <td class="py-4 px-5 font-bold text-slate-900">${item.price}</td>
+        <td class="py-4 px-5 text-center">
+            <span class="${bg}-50 text-${bg}-700 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1 border border-${bg}-100">
+                <i class="fas ${icon} text-${bg}-500"></i> ${compliantState}
+            </span>
+        </td>`
+        itemsListContainer.appendChild(tr);
+
+        // const li = document.createElement('li');
+        // li.style.display = "flex"; li.style.justifyContent = "space-between"; li.style.marginBottom = "6px";
+        // li.style.borderBottom = "1px solid #f1f5f9"; li.style.paddingBottom = "4px";
+        // li.style.backgroundColor = `${bg}`;
+        // li.innerHTML = `<span>${item.name}</span><span style="font-weight:600; font-family:monospace;">${item.price}</span>`; 
+        // itemsListContainer.appendChild(li);
     });
 
-    document.getElementById('modalReasoning').innerText = record.reasoning;
-    document.getElementById('detailsModal').style.display = 'flex';
+    document.getElementById('LedgerReasoning').innerText = record.reasoning;
+    // document.getElementById('detailsModal').style.display = 'flex';
 }
 
 function closeDetailPopup() {
